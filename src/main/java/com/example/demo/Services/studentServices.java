@@ -8,7 +8,7 @@ import java.sql.*;
 @Service
 public class studentServices {
     private static final String DB_URL = "jdbc:sqlite:mydb.db";
-
+//mqlkq
     public Student getStudentById(String id) {
         Student student = null;
         String query = "SELECT * FROM Student WHERE sid = ?";
