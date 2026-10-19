@@ -1,119 +1,152 @@
-**Project Overview:******
+# UMS Project — University Management System
 
-The LMS project is required to be a web-based application for managing and organizing online
-courses, and assessments from the perspective of students and instructors. It should support a
-range of user needs, each with specific features. The primary functionalities will include course
-creation and management, user management, assessments, and performance tracking.
-**Key Components:**
+A lightweight **University Management System** REST API built with **Spring Boot** and **SQLite**. It exposes endpoints to query student records stored in a local SQLite database.
 
-_1. User Management_
+---
 
-● User Types: Admin, Instructor, Student.
+## 🚀 Tech Stack
 
-● Admin: Manages overall system settings, creates users,and manages courses.
+| Layer | Technology |
+|-------|-----------|
+| Language | Java 17 |
+| Framework | Spring Boot 3.4.0 |
+| Persistence | Spring Data JPA + SQLite (via `sqlite-jdbc 3.45.1.0`) |
+| Build Tool | Maven (Maven Wrapper included) |
+| Database | SQLite (`mydb.db`) |
 
-● Instructor: Creates courses, manages course content, adds assignments and quizzes,
-grades students, removes students from courses.
+---
 
-● Student: Enrolls in courses, accesses course materials, take quizzes, hand in
-assignments, view assignments and quiz grades.
+## 📁 Project Structure
 
-● Features:
+```
+UMS-project/
+├── src/
+│   └── main/
+│       ├── java/com/example/demo/
+│       │   ├── DemoApplication.java          # Spring Boot entry point
+│       │   ├── controller/
+│       │   │   └── studentController.java    # REST controller
+│       │   ├── Services/
+│       │   │   └── studentServices.java      # Business logic & DB queries
+│       │   └── models/
+│       │       ├── Student.java              # Student entity / POJO
+│       │       └── ConnectDB.java            # DB connection helper
+│       └── resources/
+│           └── application.properties        # App configuration
+├── mydb.db                                   # SQLite database file
+├── pom.xml                                   # Maven build descriptor
+├── mvnw / mvnw.cmd                           # Maven wrapper scripts
+└── README.md
+```
 
-○ User Registration and Login (role-based access).
+---
 
-○ Profile Management (view/update profile information).
+## 📋 Prerequisites
 
-_2. Course Management_
-● Course Creation:
+- **Java 17** or higher installed ([Download](https://adoptium.net/))
+- **Maven** — or just use the included Maven Wrapper (`mvnw`)
 
-○ Instructors can create courses with details like title, description, duration, ... etc.
+---
 
-○ Instructors can upload media files (videos, PDFs, audio, ... etc.).
+## ⚙️ Running the Application
 
-○ Course consists of a number of lessons to be attended by students.
+### Using the Maven Wrapper (recommended)
 
-● Enrollment Management:
+**Windows:**
+```cmd
+mvnw.cmd spring-boot:run
+```
 
-○ Students can view available courses and enroll in these courses.
+**Linux/macOS:**
+```bash
+./mvnw spring-boot:run
+```
 
-○ Admins and Instructors can view the list of enrolled students per course.
+The application will start on **`http://localhost:8080`** by default.
 
-● Attendance Management
+---
 
-○ Instructors can generate an OTP per lesson to maintain the students attendance.
+## 🌐 API Endpoints
 
-○ Students can select the lesson to attend and enter the OTP received from the
-instructor.
-_3. Assessment & Grading_
+### Get Student by ID
 
-● Assessment Types: Quiz, Assignment
+```
+GET /student?id={studentId}
+```
 
-● Quiz Creation:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `id` | `String` | `2` | The student's ID (`sid`) in the database |
 
-○ Instructors can create quizzes with different types of questions (MCQ, true/false,
-short answers).
+**Example Request:**
+```
+GET http://localhost:8080/student?id=1
+```
 
-○ Instructors can create a questions bank per course.
+**Example Response:**
+```
+Hello John!
+```
 
-○ Randomized question selection for each quiz attempt.
+---
 
-● Assignment Submission:
+## 🗄️ Database
 
-○ Students can submit assignments by uploading files for review by Instructors.
+The project uses a local **SQLite** database file (`mydb.db`) located in the project root directory.
 
-● Grading and Feedback:
+### Expected Schema
 
-○ Instructors can grade assignments.
+```sql
+CREATE TABLE Student (
+    sid  INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+```
 
-○ Students receive automated feedback after quizzes and manual feedback on
-assignments.
-_4. Performance Tracking_
+> The `studentServices` class queries the `Student` table using a parameterized SQL query to look up a student by their `sid`.
 
-● Student Progress Tracking:
+---
 
-○ Instructors can track quiz scores, assignment submissions, and attendance.
+## 🔧 Configuration
 
-_5. Notifications_
+Application settings are defined in `src/main/resources/application.properties`.
 
-● System Notifications:
+```properties
+spring.application.name=demo
+```
 
-○ Students can check their notifications after they login to the system where they
-can find notifications for enrollment confirmation, graded assignments, and
-course-related updates.
+The SQLite database URL is set directly in `studentServices.java`:
 
-○ Notifications should be handled such that the students can choose to view only
-the unread notifications or all notifications.
+```java
+private static final String DB_URL = "jdbc:sqlite:mydb.db";
+```
 
-○ Instructors can check their notifications after they login to the system such as
-getting notifications for the students who enroll on their courses.
+> ℹ️ The path `mydb.db` is relative to the directory from which the application is launched (the project root).
 
-_5. Bonus Features_
+---
 
-● Role-Based Access Control:
+## 🏗️ Building a JAR
 
-○ Using Spring Security for authentication and authorization.
+To package the application into an executable JAR:
 
-○ Restrict access permissions so that they are granted based on role type.
+```cmd
+mvnw.cmd clean package
+```
 
-● Performance Analytics:
+The JAR will be generated in the `target/` directory. Run it with:
 
-○ Admins and Instructors can generate excel reports on student performance
-(including grades and attendance).
+```cmd
+java -jar target/demo-0.0.1-SNAPSHOT.jar
+```
 
-○ Visual representations (charts) of progress, performance, and course completion.
+---
 
+## 📦 Dependencies
 
-**Technical Requirements:**
-Backend
-
-● Java with Spring Boot for RESTful API services.
-
-● MySQL or PostgreSQL or SQLite or similar database management tool.
-
-Integration, Testing & Deployment
-
-● JUnit for unit testing.
-
-● Git is mandatory for version control (each member in the team should contribute and
-commit to the GitHub repository).
+| Dependency | Purpose |
+|------------|---------|
+| `spring-boot-starter-web` | REST API support |
+| `spring-boot-starter-data-jpa` | JPA/ORM support |
+| `spring-boot-devtools` | Hot reload during development |
+| `sqlite-jdbc` | JDBC driver for SQLite |
+| `spring-boot-starter-test` | Unit & integration testing |
